@@ -1,2 +1,2 @@
-# ibcontract
-IB Contract
+# ibaccount
+Retrieve account data from interactive broker 
