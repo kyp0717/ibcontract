@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/spf13/cobra"
-	"ibaccount/client"
-	//"ibaccount/models"
+	"ibcontract/client"
 	// "log"
 	"encoding/json"
 	"github.com/fatih/color"
@@ -14,13 +13,10 @@ import (
 swagger:model PostIserverSecdefSearchBody
 */
 type ReqSearchBody struct {
-
 	// should be true if the search is to be performed by name. false by default.
 	Name bool `json:"name,omitempty"`
-
 	// If search is done by name, only the assets provided in this field will be returned. Currently, only STK is supported.
 	SecType string `json:"secType,omitempty"`
-
 	// symbol or name to be searched
 	// Required: true
 	Symbol *string `json:"symbol"`
@@ -47,30 +43,45 @@ type RspSearchBody struct {
 
 // getstatusCmd represents the getstatus command
 var searchCmd = &cobra.Command{
-	Use:   "list",
+	Use:   "search",
 	Short: "retrieve list of IB accounts",
 	Long:  `A longer description that spans mult`,
 	Run: func(cmd *cobra.Command, args []string) {
-		resp, _ := listAccts()
-		resp.Print()
+		resp, _ := search2("AAPL")
+		fmt.Println(string(resp))
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(listAcctCmd)
+	rootCmd.AddCommand(searchCmd)
 }
 
 // GetAccts -- return a list of accounts based on the login session
-func search() (RespAccountList, error) {
-	url := client.BaseUrl + client.Accts
-	data, _ := client.IbGet(url)
-	var accts RespAccountList
-	json.Unmarshal([]byte(data), &accts)
-	return accts, nil
+func search(symbol string) (RspSearchBody, error) {
+	url := client.BaseUrl + client.ContractSearch
+	reqBody := map[string]string{
+		"symbol": symbol,
+	}
+
+	data, _ := client.IbPost(url, reqBody)
+	var rsp RspSearchBody
+	json.Unmarshal([]byte(data), &rsp)
+	return rsp, nil
+}
+
+// GetAccts -- return a list of accounts based on the login session
+func search2(symbol string) ([]byte, error) {
+	url := client.BaseUrl + client.ContractSearch
+	reqBody := map[string]string{
+		"symbol": symbol,
+	}
+
+	data, _ := client.IbPost(url, reqBody)
+	return data, nil
 }
 
 // Print to console
-func (a RespAccountList) Print() {
+func (a RspSearchBody) Print() {
 	cyan := color.New(color.FgCyan).SprintFunc()
-	fmt.Printf(" Accounts: %s \n", cyan(a.Accounts))
+	fmt.Printf(" ConID: %s \n", cyan(a.Symbol))
 }
