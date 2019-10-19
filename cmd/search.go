@@ -22,7 +22,7 @@ type ReqSearchBody struct {
 	Symbol *string `json:"symbol"`
 }
 
-type RspSearchBody struct {
+type Security struct {
 	// company header
 	CompanyHeader string `json:"companyHeader,omitempty"`
 	// company name
@@ -41,32 +41,52 @@ type RspSearchBody struct {
 	War string `json:"war,omitempty"`
 }
 
+type RspSecurityArray struct {
+	Payload []Security
+}
+
 // getstatusCmd represents the getstatus command
 var searchCmd = &cobra.Command{
 	Use:   "search",
 	Short: "retrieve list of IB accounts",
 	Long:  `A longer description that spans mult`,
 	Run: func(cmd *cobra.Command, args []string) {
+		resp, _ := search("AAPL")
+		//fmt.Println(string(resp))
+		fmt.Println(resp)
+	},
+}
+
+// getstatusCmd represents the getstatus command
+var search2Cmd = &cobra.Command{
+	Use:   "search2",
+	Short: "retrieve list of IB accounts",
+	Long:  `A longer description that spans mult`,
+	Run: func(cmd *cobra.Command, args []string) {
 		resp, _ := search2("AAPL")
 		fmt.Println(string(resp))
+		//fmt.Printf("%#v", resp)
+
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(search2Cmd)
 }
 
 // GetAccts -- return a list of accounts based on the login session
-func search(symbol string) (RspSearchBody, error) {
+func search(symbol string) ([]Security, error) {
 	url := client.BaseUrl + client.ContractSearch
 	reqBody := map[string]string{
 		"symbol": symbol,
 	}
 
 	data, _ := client.IbPost(url, reqBody)
-	var rsp RspSearchBody
-	json.Unmarshal([]byte(data), &rsp)
-	return rsp, nil
+	securities := make([]Security, 0)
+	//var rsp RspSecurityArray
+	json.Unmarshal([]byte(data), &securities)
+	return securities, nil
 }
 
 // GetAccts -- return a list of accounts based on the login session
@@ -81,7 +101,7 @@ func search2(symbol string) ([]byte, error) {
 }
 
 // Print to console
-func (a RspSearchBody) Print() {
+func (a RspSecurityArray) Print() {
 	cyan := color.New(color.FgCyan).SprintFunc()
-	fmt.Printf(" ConID: %s \n", cyan(a.Symbol))
+	fmt.Printf(" ConID: %s \n", cyan(a.Payload))
 }
