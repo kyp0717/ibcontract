@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"ibcontract/client"
+
+	"github.com/spf13/cobra"
+
 	// "log"
 	"encoding/json"
+
 	"github.com/fatih/color"
 )
 
@@ -52,27 +55,16 @@ var searchCmd = &cobra.Command{
 	Long:  `A longer description that spans mult`,
 	Run: func(cmd *cobra.Command, args []string) {
 		resp, _ := search("AAPL")
+		var stock Security
+		stock = resp[0]
 		//fmt.Println(string(resp))
-		fmt.Println(resp)
-	},
-}
-
-// getstatusCmd represents the getstatus command
-var search2Cmd = &cobra.Command{
-	Use:   "search2",
-	Short: "retrieve list of IB accounts",
-	Long:  `A longer description that spans mult`,
-	Run: func(cmd *cobra.Command, args []string) {
-		resp, _ := search2("AAPL")
-		fmt.Println(string(resp))
-		//fmt.Printf("%#v", resp)
-
+		// fmt.Println(resp)
+		stock.Print()
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(searchCmd)
-	rootCmd.AddCommand(search2Cmd)
 }
 
 // GetAccts -- return a list of accounts based on the login session
@@ -89,19 +81,10 @@ func search(symbol string) ([]Security, error) {
 	return securities, nil
 }
 
-// GetAccts -- return a list of accounts based on the login session
-func search2(symbol string) ([]byte, error) {
-	url := client.BaseUrl + client.ContractSearch
-	reqBody := map[string]string{
-		"symbol": symbol,
-	}
-
-	data, _ := client.IbPost(url, reqBody)
-	return data, nil
-}
-
 // Print to console
-func (a RspSecurityArray) Print() {
+func (a Security) Print() {
 	cyan := color.New(color.FgCyan).SprintFunc()
-	fmt.Printf(" ConID: %s \n", cyan(a.Payload))
+	fmt.Printf(" ConID: %s \n", cyan(a.Conid))
+	fmt.Printf(" Company: %s \n", cyan(a.CompanyName))
+
 }
