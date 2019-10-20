@@ -5,8 +5,8 @@ const (
 	// contract
 	ContractInfo    = "/iserver/contract/{conid}/info"
 	ContractFutures = "/trsrv/futures"
-	ContractSearch  = "/iserver/secdef/search"
-	ContractSecdef  = "/trsrv/secdef"
+	ContractSymbol  = "/iserver/secdef/search"
+	ContractConId   = "/trsrv/secdef"
 	// session
 	SesseionValidate = "/sso/validate"
 	SessionStatus    = "/iserver/auth/status"
